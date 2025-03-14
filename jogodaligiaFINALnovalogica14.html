@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Separar Resíduos</title>
+    <style>
+        @keyframes tremor {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .treme {
+            animation: tremor 0.3s;
+        }
+
+        .item {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;            
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+        }
+
+        .cesto {
+            width: 123px;
+            height: 159px;
+            margin: 10px;            
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            z-index: 1; /* Cestos em nível básico */
+        }
+
+        #cesto-amarelo {
+            z-index: 10; /* Eleva o cesto amarelo, se necessário */
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .bolha-residuos {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 400px; /* Ajuste conforme necessário */            
+        }
+
+        .cestos-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 400px; /* Ajuste conforme necessário */
+            margin: 0 auto;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        /* Estilo da mensagem de sucesso */
+        #mensagem-sucesso {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        #l h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #mensagem-sucesso p {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        #jogar-novamente {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        #jogar-novamente:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Estilos para os fogos de artifício */
+        @keyframes fogos {
+            0% { transform: translate(var(--x), var(--initialY)); width: var(--initialSize); opacity: 1; }
+            50% { width: 0.5vmin; opacity: 1; }
+            100% { width: var(--finalSize); opacity: 0; }
+        }
+
+        .fogos {
+            --initialSize: 0.5vmin;
+            --finalSize: 45vmin;
+            --particleSize: 0.2vmin;
+            --color1: #FFFFE0;
+            --color2: #FAEBD7;
+            --color3: #D2B48C;
+            --color4: #FFFACD;
+            --color5: #7B68EE;
+            --color6: #B0E0E6;
+            --y: -30vmin;
+            --x: -50%;
+            --initialY: 60vmin;
+            content: "";
+            animation: fogos 4s infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, var(--y));
+            width: var(--initialSize);
+            aspect-ratio: 1;
+            background: 
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 50% 0%,
+                radial-gradient(circle, var(--color2) var(--particleSize), #0000 0) 100% 50%,
+                radial-gradient(circle, var(--color3) var(--particleSize), #0000 0) 50% 100%,
+                radial-gradient(circle, var(--color4) var(--particleSize), #0000 0) 0% 50%,
+                
+                /* bottom right */
+                radial-gradient(circle, var(--color5) var(--particleSize), #0000 0) 80% 90%,
+                radial-gradient(circle, var(--color6) var(--particleSize), #0000 0) 95% 90%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 90% 70%,
+                radial-gradient(circle, var(--color2) var(--particleSize), #0000 0) 100% 60%,
+                radial-gradient(circle, var(--color3) var(--particleSize), #0000 0) 55% 80%,
+                radial-gradient(circle, var(--color4) var(--particleSize), #0000 0) 70% 77%,
+                
+                /* bottom left */
+                radial-gradient(circle, var(--color5) var(--particleSize), #0000 0) 22% 90%,
+                radial-gradient(circle, var(--color6) var(--particleSize), #0000 0) 45% 90%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 33% 70%,
+                radial-gradient(circle, var(--color2) var(--particleSize), #0000 0) 10% 60%,
+                radial-gradient(circle, var(--color3) var(--particleSize), #0000 0) 31% 80%,
+                radial-gradient(circle, var(--color4) var(--particleSize), #0000 0) 28% 77%,
+                radial-gradient(circle, var(--color5) var(--particleSize), #0000 0) 13% 72%,
+                
+                /* top left */
+                radial-gradient(circle, var(--color6) var(--particleSize), #0000 0) 80% 10%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 95% 14%,
+                radial-gradient(circle, var(--color2) var(--particleSize), #0000 0) 90% 23%,
+                radial-gradient(circle, var(--color3) var(--particleSize), #0000 0) 100% 43%,
+                radial-gradient(circle, var(--color4) var(--particleSize), #0000 0) 85% 27%,
+                radial-gradient(circle, var(--color5) var(--particleSize), #0000 0) 77% 37%,
+                radial-gradient(circle, var(--color6) var(--particleSize), #0000 0) 60% 7%,
+                
+                /* top right */
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 22% 14%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 45% 20%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 33% 34%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 10% 29%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 31% 37%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 28% 7%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 13% 42%
+            ;
+            background-size: var(--initialSize) var(--initialSize);
+            background-repeat: no-repeat;
+            z-index: 1001;
+        }
+
+        .fogos:nth-child(2),
+        .fogos:nth-child(2)::before,
+        .fogos:nth-child(2)::after {
+            --color1: pink;
+            --color2: violet;
+            --color3: fuchsia;
+            --color4: orchid;
+            --color5: plum;
+            --color6: lavender;  
+            --finalSize: 40vmin;
+            left: 30%;
+            top: 60%;
+            animation-delay: -2s;
+        }
+
+        .fogos:nth-child(3),
+        .fogos:nth-child(3)::before,
+        .fogos:nth-child(3)::after {
+            --color1: #AFEEEE;
+            --color2: #40E0D0;
+            --color3: #87CEFA;
+            --color4: #708090;
+            --color5: #E0FFFF;
+            --color6: #E6E6FA;
+            --finalSize: 35vmin;
+            left: 70%;
+            top: 60%;
+            animation-delay: -10s;
+        }
+
+        .fogos:nth-child(4),
+        .fogos:nth-child(4)::before,
+        .fogos:nth-child(4)::after {
+            --color1: #fff;
+            --color2: #bbb;
+            --color3: #ccc;
+            --color4: #ccc;
+            --color5: #bbb;
+            --color6: #fff;
+            --finalSize: 100vmin;
+            left: 20%;
+            top: 20%;
+            animation-delay: -10s;
+        }
+    </style>
+</head>
+<body>    
+    <br><br><br>
+    <div class="container">
+        <div>
+            <br><br><br><br><br><br><br><br><br><br>
+            <div class="bolha-residuos">
+                <div id="plástico" class="item" draggable="true" style="background-image: url('plastico.png');"></div>
+                <div id="papel" class="item" draggable="true" style="background-image: url('papel.png');"></div>
+                <div id="metal" class="item" draggable="true" style="background-image: url('metal.png');"></div>
+                <div id="vidro" class="item" draggable="true" style="background-image: url('vidro.png');"></div>
+                <div id="orgânico" class="item" draggable="true" style="background-image: url('organico.png');"></div>
+            </div>
+        </div>
+
+        <div>
+            <br><br><br><br>            
+            <div class="cestos-container">
+                <div id="cesto-azul" class="cesto" style="background-image: url('cesto-azul.png');"></div>
+                <div id="cesto-amarelo" class="cesto" style="background-image: url('cesto-amarelo.png');"></div>
+                <div id="cesto-verde" class="cesto" style="background-image: url('cesto-verde.png');"></div>
+                <div id="cesto-vermelho" class="cesto" style="background-image: url('cesto-vermelho.png');"></div>
+            </div>
+        </div>
+    </div>
+
+    <button id="recarregar" hidden>Recarregar</button>
+
+    <!-- Adicionar o elemento de mensagem de sucesso -->
+    <div id="mensagem-sucesso">
+        <div class="fogos"></div>
+        <div class="fogos"></div>
+        <div class="fogos"></div>
+        <div class="fogos"></div>
+        <h2>Parabéns!</h2>
+        <p>Você completou a separação dos resíduos corretamente!</p>
+        <button id="jogar-novamente">Jogar Novamente</button>
+    </div>
+
+    <script>
+        function reposicionarItensNaBolha() {
+            const bolha = document.querySelector('.bolha-residuos');
+            const itens = bolha.querySelectorAll('.item');
+            const raio = 120; // Raio do círculo            
+            const angulo = (2 * Math.PI) / itens.length; // Ângulo entre os itens
+
+            itens.forEach((item, index) => {
+                const x = Math.cos(angulo * index) * raio;
+                const y = Math.sin(angulo * index) * raio;
+                item.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        }
+
+        // Função para verificar se todos os resíduos foram colocados corretamente
+        function verificarJogoCompleto() {
+            const totalResiduos = 5; // Total de resíduos no jogo
+            let residuosColocados = 0;
+            
+            // Verifica cada cesto
+            document.querySelectorAll('.cesto').forEach(cesto => {
+                residuosColocados += cesto.querySelectorAll('.item').length;
+            });
+            
+            // Se todos os resíduos foram colocados, mostra a mensagem de sucesso
+            if (residuosColocados === totalResiduos) {
+                document.getElementById('mensagem-sucesso').style.display = 'flex';
+            }
+        }
+
+        document.getElementById('recarregar').addEventListener('click', () => {
+            // 1. Limpar todos os cestos primeiro
+            document.querySelectorAll('.cesto').forEach(cesto => {
+                // Remove todos os itens de cada cesto
+                while (cesto.querySelector('.item')) {
+                    cesto.removeChild(cesto.querySelector('.item'));
+                }
+            });
+            
+            // 2. Limpar a bolha de resíduos
+            const bolhaResiduos = document.querySelector('.bolha-residuos');
+            bolhaResiduos.innerHTML = '';
+            
+            // 3. Recriar todos os itens do zero e adicioná-los à bolha
+            const itensInfo = [
+                { id: "plástico", imagem: "plastico.png" },
+                { id: "papel", imagem: "papel.png" },
+                { id: "metal", imagem: "metal.png" },
+                { id: "vidro", imagem: "vidro.png" },
+                { id: "orgânico", imagem: "organico.png" }
+            ];
+            
+            // Embaralhar o array de itens usando o algoritmo Fisher-Yates
+            for (let i = itensInfo.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [itensInfo[i], itensInfo[j]] = [itensInfo[j], itensInfo[i]];
+            }
+            
+            // Adicionar os itens embaralhados
+            itensInfo.forEach(info => {
+                const novoItem = document.createElement('div');
+                novoItem.id = info.id;
+                novoItem.className = 'item';
+                novoItem.draggable = true;
+                novoItem.style.backgroundImage = `url('imagens/${info.imagem}')`;
+                novoItem.style.position = 'absolute';
+                
+                // Adicionar evento de drag para o novo item
+                novoItem.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.id);
+                });
+                
+                bolhaResiduos.appendChild(novoItem);
+            });
+            
+            // 4. Embaralhar os cestos
+            const cestosContainer = document.querySelector('.cestos-container');
+            const cestos = Array.from(cestosContainer.children);
+            
+            // Embaralha os elementos usando o algoritmo de Fisher-Yates
+            for (let i = cestos.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cestos[i], cestos[j]] = [cestos[j], cestos[i]];
+            }
+            
+            // Remove os elementos e os adiciona novamente na nova ordem
+            cestosContainer.innerHTML = '';
+            cestos.forEach(cesto => cestosContainer.appendChild(cesto));
+            
+            // 5. Reposicionar os itens na bolha em forma de círculo
+            // Agora os itens já estão em ordem aleatória antes de posicioná-los
+            reposicionarItensNaBolha();
+            
+            // 6. Esconder a mensagem de sucesso se estiver visível
+            document.getElementById('mensagem-sucesso').style.display = 'none';
+        });
+
+        // Adicionar evento para o botão "Jogar Novamente" da mensagem de sucesso
+        document.getElementById('jogar-novamente').addEventListener('click', () => {
+            document.getElementById('recarregar').click();
+        });
+
+        const correspondenciasCorretas = {
+            "plástico": "cesto-azul",
+            "papel": "cesto-azul",
+            "metal": "cesto-amarelo",
+            "vidro": "cesto-verde",
+            "orgânico": "cesto-vermelho"
+        };
+
+
+        // Posicionar os itens em uma bolha (círculo)
+        reposicionarItensNaBolha();
+
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.id);
+            });
+        });
+
+        document.querySelectorAll('.cesto').forEach(cesto => {
+            // Adicione os eventos dragenter e dragleave para feedback visual
+            cesto.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                cesto.style.opacity = '0.8'; // Feedback visual
+            });
+
+            cesto.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                cesto.style.opacity = '1';
+            });
+
+            cesto.addEventListener('dragover', (e) => {
+                e.preventDefault(); // Permite o drop
+            });
+
+            cesto.addEventListener('drop', (e) => {
+                e.preventDefault(); // Previne o comportamento padrão do navegador
+                cesto.style.opacity = '1'; // Restaura a opacidade
+
+                // Obtém o ID do item arrastado
+                const residuoId = e.dataTransfer.getData('text/plain');
+                const residuoElemento = document.getElementById(residuoId);
+
+                // Obtém o cesto no qual o item foi solto
+                // Usando currentTarget que sempre referencia o elemento que o evento foi registrado
+                let cestoAlvo = e.currentTarget;
+
+                console.log("🎯 Item solto:", residuoId);
+                console.log("🎯 Cesto alvo detectado:", cestoAlvo ? cestoAlvo.id : 'Nenhum');
+
+                // Verifica se o resíduo pertence ao cesto correto
+                if (correspondenciasCorretas[residuoId] === cestoAlvo.id) {
+                    console.log("✅ Item aceito no cesto:", cestoAlvo.id);
+
+                    // Remove o item da bolha ou de qualquer outro cesto, se necessário
+                    if (residuoElemento.parentElement) {
+                        residuoElemento.parentElement.removeChild(residuoElemento);
+                    }
+
+                    // Adiciona ao cesto correto
+                    cestoAlvo.appendChild(residuoElemento);
+
+                    // Ajusta a posição do item dentro do cesto
+                    // Centralizando melhor dentro do cesto
+                    residuoElemento.style.position = "absolute";
+                    residuoElemento.style.left = "50%";
+                    residuoElemento.style.top = "50%";
+                    residuoElemento.style.transform = "translate(-50%, -50%)";
+                    residuoElemento.style.zIndex = "0"; // Abaixo do cesto
+
+                    // Oculta a imagem após ser adicionado
+                    residuoElemento.style.backgroundImage = "none";
+                    residuoElemento.style.backgroundColor = "transparent";
+                    
+                    // Desativa o drag and drop para evitar problemas
+                    residuoElemento.setAttribute("draggable", "false");
+                    
+                    // Verificar se o jogo foi completado
+                    verificarJogoCompleto();
+                } else {
+                    console.warn(`⛔ Item errado! "${residuoId}" deveria ir para: ${correspondenciasCorretas[residuoId]}, mas foi para ${cestoAlvo.id}`);
+
+                    // Animação de erro
+                    residuoElemento.classList.add("treme");
+                    setTimeout(() => {
+                        residuoElemento.classList.remove("treme");
+                    }, 300);
+                }
+            });
+        });
+        // Adaptação para eventos de toque em dispositivos móveis
+        document.querySelectorAll('.item').forEach(item => {
+            // Mantém o comportamento de drag and drop para desktop
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.id);
+            });
+
+            // Adiciona suporte para eventos de toque
+            let itemAtivo = null;
+            let offsetX, offsetY;
+
+            // Quando o usuário começa a tocar no item
+            item.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Previne comportamento padrão (como scroll)
+                
+                itemAtivo = e.target;
+                
+                // Calculando o offset para manter a posição relativa do toque no item
+                const touch = e.touches[0];
+                const rect = itemAtivo.getBoundingClientRect();
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+                
+                // Aumenta levemente o tamanho para feedback visual
+                itemAtivo.style.transform = 'scale(1.1)';
+                itemAtivo.style.zIndex = '100';
+            });
+
+            // Quando o usuário move o dedo com o item
+            document.addEventListener('touchmove', (e) => {
+                if (!itemAtivo) return;
+                
+                e.preventDefault();
+                const touch = e.touches[0];
+                
+                // Mover o item com o dedo, ajustando pelo offset
+                itemAtivo.style.position = 'absolute';
+                itemAtivo.style.left = (touch.clientX - offsetX) + 'px';
+                itemAtivo.style.top = (touch.clientY - offsetY) + 'px';
+            });
+
+            // Quando o usuário solta o item
+            document.addEventListener('touchend', (e) => {
+                if (!itemAtivo) return;
+                
+                // Restaura o visual do item
+                itemAtivo.style.transform = '';
+                itemAtivo.style.zIndex = '';
+                
+                // Verifica se o item foi solto sobre algum cesto
+                const rect = itemAtivo.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                // Encontra o cesto sob o ponto central do item
+                let cestoDrop = null;
+                document.querySelectorAll('.cesto').forEach(cesto => {
+                    const cestoRect = cesto.getBoundingClientRect();
+                    if (x > cestoRect.left && x < cestoRect.right &&
+                        y > cestoRect.top && y < cestoRect.bottom) {
+                        cestoDrop = cesto;
+                    }
+                });
+                
+                // Se encontrou um cesto, processa o "drop"
+                if (cestoDrop) {
+                    const residuoId = itemAtivo.id;
+                    
+                    // Feedback visual para o cesto
+                    cestoDrop.style.opacity = '0.8';
+                    setTimeout(() => {
+                        cestoDrop.style.opacity = '1';
+                    }, 200);
+                    
+                    // Verifica se o resíduo pertence ao cesto correto
+                    if (correspondenciasCorretas[residuoId] === cestoDrop.id) {
+                        console.log("✅ Item aceito no cesto:", cestoDrop.id);
+                        
+                        // Remove o item da sua posição atual
+                        if (itemAtivo.parentElement) {
+                            itemAtivo.parentElement.removeChild(itemAtivo);
+                        }
+                        
+                        // Adiciona ao cesto correto
+                        cestoDrop.appendChild(itemAtivo);
+                        
+                        // Ajusta a posição do item dentro do cesto
+                        itemAtivo.style.position = "absolute";
+                        itemAtivo.style.left = "50%";
+                        itemAtivo.style.top = "50%";
+                        itemAtivo.style.transform = "translate(-50%, -50%)";
+                        itemAtivo.style.zIndex = "0";
+                        
+                        // Oculta a imagem após ser adicionado
+                        itemAtivo.style.backgroundImage = "none";
+                        itemAtivo.style.backgroundColor = "transparent";
+                        
+                        // Verificar se o jogo foi completado
+                        verificarJogoCompleto();
+                    } else {
+                        console.warn(`⛔ Item errado! "${residuoId}" deveria ir para: ${correspondenciasCorretas[residuoId]}, mas foi para ${cestoDrop.id}`);
+                        
+                        // Animação de erro
+                        itemAtivo.classList.add("treme");
+                        setTimeout(() => {
+                            itemAtivo.classList.remove("treme");
+                        }, 300);
+                        
+                        // Retorna o item para a posição original na bolha
+                        reposicionarItensNaBolha();
+                    }
+                } else {
+                    // Se não encontrou cesto, retorna o item para a bolha
+                    reposicionarItensNaBolha();
+                }
+                
+                itemAtivo = null;
+            });
+        });
+
+    // Adicionar meta tag viewport adequada (se não estiver já no HTML)
+    function adicionarMetaViewport() {
+        if (!document.querySelector('meta[name="viewport"]')) {
+            const metaViewport = document.createElement('meta');
+            metaViewport.name = 'viewport';
+            metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+            document.head.appendChild(metaViewport);
+        }
+    }
+
+    // Ajustes responsivos para o layout
+    function aplicarAjustesResponsivos() {
+        const mediaQuery = window.matchMedia('(max-width: 768px)');
+        
+        function ajustarLayout(e) {
+            const container = document.querySelector('.container');
+            
+            if (e.matches) {
+                // Layout para celular (empilhado)
+                container.style.flexDirection = 'column';
+                
+                // Ajustar tamanho dos elementos para telas menores
+                document.querySelector('.bolha-residuos').style.height = '200px';
+                document.querySelector('.bolha-residuos').style.marginBottom = '20px';
+                
+                // Reduzir raio da bolha para celular
+                window.raioCirculoBolha = 80; // Variável global para usar na função reposicionarItensNaBolha
+            } else {
+                // Layout para desktop (lado a lado)
+                container.style.flexDirection = 'row';
+                document.querySelector('.bolha-residuos').style.height = '300px';
+                document.querySelector('.bolha-residuos').style.marginBottom = '0';
+                
+                // Restaurar raio original
+                window.raioCirculoBolha = 120;
+            }
+            
+            // Reposicionar itens com o raio ajustado
+            reposicionarItensNaBolaResponsivo();
+        }
+        
+        // Versão responsiva da função reposicionarItensNaBolha
+        window.reposicionarItensNaBolaResponsivo = function() {
+            const bolha = document.querySelector('.bolha-residuos');
+            const itens = bolha.querySelectorAll('.item');
+            const raio = window.raioCirculoBolha || 120; // Usa o raio ajustado ou o padrão
+            const angulo = (2 * Math.PI) / itens.length;
+            
+            itens.forEach((item, index) => {
+                const x = Math.cos(angulo * index) * raio;
+                const y = Math.sin(angulo * index) * raio;
+                item.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        }
+        
+        // Chama a função quando a página carrega e quando a tela muda de tamanho
+        ajustarLayout(mediaQuery);
+        mediaQuery.addEventListener('change', ajustarLayout);
+    }
+
+    // Inicializar ajustes responsivos
+    adicionarMetaViewport();
+    aplicarAjustesResponsivos();
+
+    // Sobrescrever a função original reposicionarItensNaBolha para usar a versão responsiva
+    const reposicionarItensNaBolhaOriginal = reposicionarItensNaBolha;
+    reposicionarItensNaBolha = function() {
+        reposicionarItensNaBolaResponsivo();
+    };
+    </script>
+</body>
+</html>
